@@ -576,7 +576,8 @@
     <resource name="PUs"/>
     <resource name="techTokens"/>
   </resourceList>
-  <playerList>
+
+ <playerList>
     <!-- In turn order -->
     <player name="Russians" optional="false"/>
     <player name="Germans" optional="false"/>
@@ -606,6 +607,11 @@
     <unit name="aaGun"/>
     <unit name="factory"/>
   </unitList>
+	<!-- territoryEffect add in aiding in the blocking / unblocking of Sea Zone 16-->
+	<territoryEffectList>
+		<territoryEffect name="blockSZ16"/>
+	</territoryEffectList>
+	<!-- End added territoryEffect -->
   <gamePlay>
     <delegate name="initDelegate" javaClass="games.strategy.triplea.delegate.InitializationDelegate" display="Initializing Delegates"/>
     <delegate name="tech" javaClass="games.strategy.triplea.delegate.TechnologyDelegate" display="Research Technology"/>
@@ -1392,16 +1398,36 @@
       <option name="canalName" value="Panama Canal"/>
       <option name="landTerritories" value="Central America"/>
     </attachment>
-    <!--
-				<attachment name="canalAttachmentTurkish_Straits" attachTo="17 Sea Zone" javaClass="games.strategy.triplea.attachments.CanalAttachment" type="territory">
-						<option name="canalName" value="Turkish Straits"/>
-						<option name="landTerritories" value="Turkey"/>
-				</attachment>
-				<attachment name="canalAttachmentTurkish_Straits" attachTo="18 Sea Zone" javaClass="games.strategy.triplea.attachments.CanalAttachment" type="territory">
-						<option name="canalName" value="Turkish Straits"/>
-						<option name="landTerritories" value="Turkey"/>
-				</attachment>
-				-->
+	<!-- 
+	<attachment name="canalAttachmentTurkish_Straits" attachTo="15 Sea Zone" javaClass="games.strategy.triplea.attachments.CanalAttachment" type="territory">
+			<option name="canalName" value="Turkish Straits"/>
+			<option name="landTerritories" value=""/>
+	</attachment>
+	<attachment name="canalAttachmentTurkish_Straits" attachTo="16 Sea Zone" javaClass="games.strategy.triplea.attachments.CanalAttachment" type="territory">
+			<option name="canalName" value="Turkish Straits"/>
+			<option name="landTerritories" value=""/>
+	</attachment>
+	-->
+	<!-- The following Attachments were added to aid in blocking / unblocking Sea Zone 16 -->
+    <attachment name="territoryAttachment" attachTo="16 Sea Zone" javaClass="games.strategy.triplea.attachments.TerritoryAttachment" type="territory">
+      <option name="territoryEffect" value="blockSZ16"/>
+    </attachment>
+	<attachment name="territoryEffectAttachment" attachTo="blockSZ16" javaClass="games.strategy.triplea.attachments.TerritoryEffectAttachment" type="territoryEffect">
+		<option name="unitsNotAllowed" value="transport:submarine:destroyer:cruiser:battleship:carrier"/>
+	</attachment>
+
+	<attachment name="conditionAttachmentBlockSZ16" attachTo="Russians" javaClass="games.strategy.triplea.attachments.RulesAttachment" type="player">
+		<option name="gameProperty" value="Block Sea Zone 16 (Black Sea)"/>
+		<option name="invert" value="true"/>
+	</attachment>
+	
+	<attachment name="triggerAttachmentBlockSZ16" attachTo="Russians" javaClass="games.strategy.triplea.attachments.TriggerAttachment" type="player">
+		<option name="conditions" value="conditionAttachmentBlockSZ16"/>
+		<option name="territories" value="16 Sea Zone"/>
+		<option name="territoryAttachmentName" value="TerritoryAttachment" count="territoryAttachment"/>
+		<option name="territoryProperty" value="territoryEffect" count="-reset-"/>
+	</attachment>
+	<!-- End added Attachments -->
   </attachmentList>
   <initialize>
     <ownerInitialize>
@@ -1885,7 +1911,16 @@
     <property name="Placement Restricted By Factory" value="true" editable="false">
       <boolean/>
     </property>
-    <property name="Raids May Be Preceeded By Air Battles" value="false" editable="true">
+	<!-- Property added to allow the blocking / unblocking of Sea Zone 16 -->
+	<property name="Use Triggers" value="true" editable="false">
+		<boolean/>
+	</property>
+
+	<property name="Block Sea Zone 16 (Black Sea)" value="false" editable="true">
+		<boolean/>
+	</property>
+	<!-- End Property Add -->
+   <property name="Raids May Be Preceeded By Air Battles" value="false" editable="true">
       <boolean/>
     </property>
     <property name="neutralCharge" value="9999999" editable="false">
@@ -1917,8 +1952,8 @@
 					<br>5. Factories now have their own AA to defend during strategic bombing.
 					<br>6. Honolulu is now a Victory City.
 					<br>
-					<br>1st Optional Rule: SZ16 (Black Sea) can't be accessed by ships.
-					<br>2nd Optional Rule: Select the game option "Raids May Be Preceeded By Air Battles" to turn on Escorts and Interceptors for Strategic Bombing Raids. 
+					<br>1st Optional Rule: Select the map option "Block Sea Zone 16 (Black Sea)" to block access to SZ16 (Black Sea) by ships.
+					<br>2nd Optional Rule: Select the map option "Raids May Be Preceeded By Air Battles" to turn on Escorts and Interceptors for Strategic Bombing Raids. 
 						All Escorts, Interceptors, and Bombers all @ 1 for a single round before the bombing raid (same rules as Global 1940 Second Edition).
 					<br>
 					<br>Also, Technology is turned off by default (if turned on, will use ww2v3 (AA 50th Anniversary Edition) technology).
